@@ -1,13 +1,19 @@
+using System;
+using System.IO;
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using HtmlAgilityPack;
+using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+
 
 public static class checkline
 {
     [FunctionName("CheckLine")]
-    public static async Task<IActionResult> Run(
+        public static IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
         ILogger log)
     {
