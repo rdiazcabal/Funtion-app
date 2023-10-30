@@ -1,40 +1,41 @@
-using System;
-using System.Net.Http;
-using HtmlAgilityPack;
+using System.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
+using HtmlAgilityPack;
 
-namespace rw
+public static class checkline
 {
-    public static class rwdynamicalert
+    [FunctionName("CheckLine")]
+    public static async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+        ILogger log)
     {
-        [FunctionName("rwdynamicalert")]
-        public static async Task Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
+        string url = "https://www.simplifiedlogistics.com/heartbeattest/heartBeatReport.aspx";  // URL de la página web que deseas revisar
+        string textoObjetivo = "HeartBeat Status Good";
+
+        using (var client = new WebClient())
         {
-            log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-
-            string aspxPageUrl = "https://www.simplifiedlogistics.com/heartbeattest/heartBeatReport.aspx";
-            
-            using (HttpClient client = new HttpClient())
+            try
             {
-                string PageHtml =await client.GetStringAsync(aspxPageUrl);
+                string htmlContent = client.DownloadString(url);
+                var htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(htmlContent);
+                string content = htmlDocument.DocumentNode.InnerText;
 
-                HtmlDocument doc = new HtmlDocument();
-                doc.LoadHtml(PageHtml);
-
-                 HtmlNode spanElemnt = doc.DocumentNode.SelectSingleNode("//span[contains(@class, HeartBeat Status Good)]");
-
-                 if (spanElemnt != null)
-                 {
-                    string spanContent = spanElemnt.InnerText;
-                    log.LogInformation($"Span Content: {spanContent}");
-
-                 }
-                 else
-                 {
-                    log.LogInformation("The span was not found on the ASPX page.");
-                 }
+                if (content.Contains(textoObjetivo))
+                {
+                    return new OkObjectResult($"The Text '{textoObjetivo}' Was found.");
+                }
+                else
+                {
+                    return new OkObjectResult($"The text '{textoObjetivo}' was not found.");
+                }
+            }
+            catch (WebException ex)
+            {
+                log.LogError($"We cannot access to the page message: {ex.Message}");
+                return new StatusCodeResult(500);
             }
         }
     }
