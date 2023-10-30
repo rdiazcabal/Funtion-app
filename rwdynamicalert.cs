@@ -17,7 +17,7 @@ public static class checkline
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
         ILogger log)
     {
-        string url = "https://www.simplifiedlogistics.com/heartbeattest/heartBeatReport.aspx";  // URL de la página web que deseas revisar
+        string url = "https://www.simplifiedlogistics.com/heartbeattest/heartBeatReport.aspx";
         string textoObjetivo = "HeartBeat Status Good";
 
         using (var client = new WebClient())
