@@ -2,7 +2,6 @@ using System;
 using System.Net.Http;
 using HtmlAgilityPack;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
